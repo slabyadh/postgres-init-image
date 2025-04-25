@@ -45,12 +45,11 @@ jobs:
           psql -h localhost -U postgres -d demo -c "SELECT * FROM users;"
 
       - name: Dump the database
+        env:
+         PGPASSWORD: postgres
         run: |
           mkdir -p dumps
-          docker ps  # Debug step
-          CONTAINER_ID=$(docker ps -q --filter ancestor=monlogin/postgres-init:latest)
-          echo "Container ID: $CONTAINER_ID"
-          docker exec $CONTAINER_ID pg_dump -U postgres -d demo > dumps/dump.sql
+          pg_dump -h localhost -U postgres -d demo > dumps/dump.sql
 
       - name: Upload database backup as artifact
         uses: actions/upload-artifact@v4
