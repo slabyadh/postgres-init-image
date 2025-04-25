@@ -44,12 +44,13 @@ jobs:
         run: |
           psql -h localhost -U postgres -d demo -c "SELECT * FROM users;"
 
-      - name: Dump the database
-        env:
-         PGPASSWORD: postgres
+      - name: Dump the database (inside Docker)
         run: |
           mkdir -p dumps
-          pg_dump -h localhost -U postgres -d demo > dumps/dump.sql
+          docker run --rm --network host \
+            -e PGPASSWORD=postgres \
+            sabrinelab/postgres-init:latest \
+            pg_dump -h localhost -U postgres -d demo > dumps/dump.sql
 
       - name: Upload database backup as artifact
         uses: actions/upload-artifact@v4
